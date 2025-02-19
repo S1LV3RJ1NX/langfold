@@ -4,8 +4,7 @@ repos:
     rev: 0.6.1
     hooks:
       # Compile requirements
-      - id: pip-compile
-        args: [requirements.in, -o, requirements.txt]
+      - id: uv-export
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:
