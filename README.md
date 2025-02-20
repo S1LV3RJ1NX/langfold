@@ -30,4 +30,8 @@ uv sync
 
 ## Execute
 
-TBD
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 21120 --reload
+```
+
+- This builds the workflow graph from [agent.yaml](./config/agent.yaml) and starts the FastAPI server at port 21120
