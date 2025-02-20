@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     TFY_GATEWAY_API_KEY: str = ""
 
     AGENT_CONFIG: str = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "config", "agent.yaml"
+        os.path.dirname(os.path.dirname(__file__)), "agent.yaml"
     )
 
     # Check if the agent config path exists, if not raise an error, else load the yaml file
