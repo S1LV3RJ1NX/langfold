@@ -16,6 +16,3 @@ conditional_edges:
     mapping:
       tool_node: tool_node
       end: END
-
-tools:
-  - name: get_username
