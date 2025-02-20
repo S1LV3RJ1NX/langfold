@@ -1,6 +1,5 @@
-# TODO: Add auto registry
-from src.tools.username import get_username
+from src.utils.tool_registry import auto_register_tools
 
-TOOLS = [get_username]
-
-TOOLS_BY_NAME = {tool.name: tool for tool in TOOLS}
+# TOOLS: List of BaseTool instances
+# TOOLS_BY_NAME: Dictionary of tool names and their corresponding BaseTool instances
+TOOLS, TOOLS_BY_NAME = auto_register_tools()

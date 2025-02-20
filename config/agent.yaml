@@ -1,0 +1,21 @@
+# Compulsory keys
+nodes:
+  - name: tool_node
+  - name: call_model
+  - name: should_continue
+
+entry_point: call_model
+
+edges:
+  - from: tool_node
+    to: call_model
+
+conditional_edges:
+  - from: call_model
+    condition: should_continue
+    mapping:
+      tool_node: tool_node
+      end: END
+
+tools:
+  - name: get_username
