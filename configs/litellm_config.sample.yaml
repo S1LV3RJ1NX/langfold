@@ -41,7 +41,7 @@ litellm_settings:
 
 general_settings:
   # TODO: Change this key
-  master_key: sk-OrYRPFR0nPXabaW86fR2CypmVpW4YFdo
+  master_key: sk-******
 
 # LiteLLM will use Redis to track rpm/tpm usage
 # Load balancer across multiple litellm proxies
