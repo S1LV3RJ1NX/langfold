@@ -1,0 +1,51 @@
+model_list:
+  #### LLMs Sample Integrations ####
+
+  ######### Ollama #########
+  # - model_name: qwen2.5-1.5b
+  #   litellm_params:
+  #     model: openai/qwen2.5:1.5b
+  #     api_base: http://ollama:11434/v1
+  #     api_key: "sk-1234"
+  #     rpm: 100 # requests per minute
+  #     # tpm: 1000 # tokens per minute
+  #   model_info:
+  #     type: chat
+
+  ######## OpenAI ########
+  # - model_name: gpt-4o-mini
+  #   litellm_params:
+  #     model: openai/gpt-4o-mini
+  #     api_base: https://api.openai.com/v1
+  #     api_key: "sk-******"
+  #     rpm: 100
+  #   model_info:
+  #     type: chat
+
+  ######### TFY GATEWAY #########
+  # - model_name: gpt-4o-mini
+  #   litellm_params:
+  #     model: openai/gpt-4o-mini
+  #     api_base: https://llm-gateway.truefoundry.com/api/inference/openai
+  #     api_key: "sk-******"
+  #     rpm: 100
+  #   model_info:
+  #     type: chat
+
+litellm_settings:
+  num_retries: 3 # retry call 3 times on each model_name (e.g. zephyr-beta)
+  request_timeout: 10 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
+  allowed_fails: 3 # cooldown model if it fails > 1 call in a minute.
+  set_verbose: True
+  cache: True # set cache responses to True, litellm defaults to using a redis cache
+
+general_settings:
+  # TODO: Change this key
+  master_key: sk-OrYRPFR0nPXabaW86fR2CypmVpW4YFdo
+
+# LiteLLM will use Redis to track rpm/tpm usage
+# Load balancer across multiple litellm proxies
+router_settings:
+  redis_host: langfold-redis
+  redis_password: password
+  redis_port: 6380

@@ -16,6 +16,6 @@ ADD . /app
 WORKDIR /app
 RUN uv sync --frozen
 
-EXPOSE 8000
+EXPOSE 21120
 
-CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "21120", "--reload"]
