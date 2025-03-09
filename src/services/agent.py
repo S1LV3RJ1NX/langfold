@@ -1,5 +1,8 @@
 # NOTE: This file will always be there
-from src.services.graph_builder import GRAPH
+from langchain_openai import ChatOpenAI
+from src.config import Settings
+from src.tools import TOOLS
+from src.tools.username import get_username
 from src.utils.chat import print_event, get_ai_response
 
 
@@ -20,24 +23,62 @@ async def run_agent(thread_id: str, user_input: str):
         dict: A dictionary containing the AI's response.
     """
 
-    # Configuration for the agent, including the thread ID
-    config = {"configurable": {"thread_id": thread_id}}
+    AGENT_CONFIG = Settings().AGENT_CONFIG
+    print(AGENT_CONFIG)
 
-    # Input messages formatted for the agent's processing
-    inputs = {"messages": [("user", user_input)]}
+    if AGENT_CONFIG.get("type") == "custom_react_agent":
+        from src.services.graph_builder import GRAPH
 
-    # List to store events generated during the processing
-    events = []
+        config = {"configurable": {"thread_id": thread_id}}
 
-    # Asynchronously stream events from the agent's graph
-    async for event in GRAPH.astream(inputs, config=config, stream_mode="values"):
-        # Print the event to the console or log
-        print_event(event)
-        # Append the event to the events list for further processing
-        events.append(event)
+        # Input messages formatted for the agent's processing
+        inputs = {"messages": [("user", user_input)]}
 
-    # Get the AI's response based on the collected events
-    response = await get_ai_response(events)
+        # List to store events generated during the processing
+        events = []
 
-    # Return the response in a structured format
-    return {"response": response}
+        # Asynchronously stream events from the agent's graph
+        async for event in GRAPH.astream(inputs, config=config, stream_mode="values"):
+            # Print the event to the console or log
+            print_event(event)
+            # Append the event to the events list for further processing
+            events.append(event)
+
+        # Get the AI's response based on the collected events
+        response = await get_ai_response(events)
+
+        # Return the response in a structured format
+        return {"response": response}
+
+    else:
+        print(f"Running {AGENT_CONFIG.get('type')} agent")
+
+        # Input messages formatted for the agent's processing
+        inputs = {"messages": [("user", user_input)]}
+
+        # List to store events generated during the processing
+        events = []
+        from langgraph.prebuilt import create_react_agent
+
+        settings = Settings()
+        model = ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0,
+            base_url=settings.LITELLM_GATEWAY_URL,
+            api_key=settings.LITELLM_GATEWAY_API_KEY,
+        )
+
+        graph = create_react_agent(model=model, tools=TOOLS)
+
+        # Asynchronously stream events from the agent's graph
+        async for event in graph.astream(inputs, stream_mode="values"):
+            # Print the event to the console or log
+            print_event(event)
+            # Append the event to the events list for further processing
+            events.append(event)
+
+        # Get the AI's response based on the collected events
+        response = await get_ai_response(events)
+
+        # Return the response in a structured format
+        return {"response": response}
