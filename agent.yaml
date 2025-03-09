@@ -16,3 +16,8 @@ conditional_edges:
     mapping:
       tool_node: tool_node
       end: END
+
+tools:
+  - name: get_user_name
+    description: Use this tool when user asks for their username.
+    # provide parameters if any.
