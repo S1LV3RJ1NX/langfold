@@ -1,6 +1,6 @@
 from langchain_core.runnables import RunnableConfig
 from src.models.state import AgentState
-from src.services.agents.model_provider import TOOL_ENABLED_MODEL
+from src.core.agents.model_provider import TOOL_ENABLED_MODEL
 
 
 async def call_model(

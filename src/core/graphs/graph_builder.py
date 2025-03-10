@@ -17,7 +17,7 @@ from importlib import import_module
 
 from src.config import settings
 from src.utils.logger import logger
-from src.utils.graph import convert_special_nodes
+from src.core.graphs.graph import convert_special_nodes
 
 
 class GraphBuilder:
@@ -62,7 +62,7 @@ class GraphBuilder:
         for node in self.agent_config["nodes"]:
             try:
                 # Dynamically import the node's module and get its function
-                module = import_module(f"src.nodes.{node['name']}")
+                module = import_module(f"src.core.nodes.{node['name']}")
                 node_function = getattr(module, node["name"])
                 self.workflow.add_node(node["name"], node_function)
                 logger.debug(f"Successfully added node: {node['name']}")
@@ -102,7 +102,7 @@ class GraphBuilder:
         for cond_edge in self.agent_config["conditional_edges"]:
             try:
                 # Import condition function and set up mapping of outcomes to next nodes
-                module = import_module(f"src.nodes.{cond_edge['condition']}")
+                module = import_module(f"src.core.nodes.{cond_edge['condition']}")
                 mapping = {
                     k: convert_special_nodes(v) for k, v in cond_edge["mapping"].items()
                 }
