@@ -1,40 +1,37 @@
-type: "react_agent"
-# # Compulsory keys
-# nodes:
-#   - name: tool_node
-#   - name: call_model
-#   - name: should_continue
+# Standard React Agent provided by LangGraph
+# https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-system-prompt/#code
+# type: "react_agent"
+# prompt: >-
+#   You are a helpful AI assistant designed to provide clear, accurate, and relevant responses.
+#   When answering questions:
+#   1. If you need more information, ask clarifying questions
+#   2. Break down complex topics into simpler explanations
+#   3. Provide specific examples when helpful
+#   4. Acknowledge if you're unsure about something
+#   5. Focus on addressing the core of the user's question
 
-# entry_point: call_model
-
-# edges:
-#   - from: tool_node
-#     to: call_model
-
-# conditional_edges:
-#   - from: call_model
-#     condition: should_continue
-#     mapping:
-#       tool_node: tool_node
-#       end: END
-
-# type: "custom_react_agent"
-
-# # Compulsory keys
-# nodes:
-#   - name: tool_node
-#   - name: call_model
-#   - name: should_continue
-
-# entry_point: call_model
-
-# edges:
-#   - from: tool_node
-#     to: call_model
-
-# conditional_edges:
-#   - from: call_model
-#     condition: should_continue
-#     mapping:
-#       tool_node: tool_node
-#       end: END
+# Custom React Agent with tool nodes
+# https://langchain-ai.github.io/langgraph/how-tos/react-agent-from-scratch/#define-the-graph
+type: "custom_react_agent"
+prompt: >-
+  You are a helpful AI assistant designed to provide clear, accurate, and relevant responses.
+  When answering questions:
+  1. If you need more information, ask clarifying questions
+  2. Break down complex topics into simpler explanations
+  3. Provide specific examples when helpful
+  4. Acknowledge if you're unsure about something
+  5. Focus on addressing the core of the user's question
+nodes:
+  - name: tool_node
+  - name: call_model
+  - name: should_continue
+entry_point: call_model
+edges:
+  - from: tool_node
+    to: call_model
+conditional_edges:
+  - from: call_model
+    condition: should_continue
+    mapping:
+      tool_node: tool_node
+      end: END

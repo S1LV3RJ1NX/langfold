@@ -5,7 +5,7 @@ import logging
 
 from src.models.user_input import UserInput
 
-from src.services.agent import run_agent
+from src.services.agents import run_agent
 from src.utils.logger import logger
 
 app = FastAPI(

@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     Settings class to hold all the environment variables
     """
 
+    # Log level can be configured via environment variable, defaults to INFO
     LOG_LEVEL: str = "INFO"
-
     LITELLM_GATEWAY_URL: str
     LITELLM_GATEWAY_API_KEY: str
 
