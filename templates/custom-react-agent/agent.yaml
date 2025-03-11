@@ -30,21 +30,3 @@ tools:
       type: object
       properties: {}
       required: []
-
-# To use the standard react_agent instead, comment out everything above and uncomment this section:
-# type: "react_agent"
-# prompt: >-
-#   You are a helpful AI assistant designed to provide clear, accurate, and relevant responses.
-#   When answering questions:
-#   1. If you need more information, ask clarifying questions
-#   2. Break down complex topics into simpler explanations
-#   3. Provide specific examples when helpful
-#   4. Acknowledge if you're unsure about something
-#   5. Focus on addressing the core of the user's question
-# tools:
-#   - name: get_username
-#     description: "Use this tool when user asks for their username."
-#     arguments:
-#       type: object
-#       properties: {}
-#       required: []

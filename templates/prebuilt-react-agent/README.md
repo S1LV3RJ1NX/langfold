@@ -1,15 +1,19 @@
 # React Agent Implementation Guide
 
 ## Overview
+
 The React Agent is a standard implementation based on LangGraph's React pattern. It provides a simpler, more straightforward approach for building agents that need to interact with tools in a sequential manner.
 
 ## When to Use React Agent
+
 Choose the React Agent when:
+
 - You need a simple, sequential tool execution flow
 - You don't need complex branching or conditional tool execution
 - You want a lightweight implementation with minimal boilerplate
 
 ## Architecture
+
 ```mermaid
 graph TD
     A[User Input] --> B[React Agent]
@@ -22,6 +26,7 @@ graph TD
 ```
 
 ## Configuration
+
 To use the React Agent, configure your `agent.yaml` as follows:
 
 ```yaml
@@ -53,11 +58,13 @@ tools:
 ## Implementation Details
 
 ### Core Components
+
 1. **Agent Configuration**: Defined in `agent.yaml`
 2. **Tool Registry**: Automatically loads tools specified in configuration
 3. **Response Generation**: Handles the agent's responses and tool interactions
 
 ### Flow
+
 1. User input is received
 2. Agent processes the input and determines required tools
 3. Tools are executed sequentially
@@ -80,12 +87,14 @@ tool_enabled_model = model.bind_tools(TOOLS)
 ```
 
 ## Best Practices
+
 1. Keep tool descriptions clear and specific
 2. Provide comprehensive argument descriptions
 3. Use meaningful tool names
 4. Document tool requirements and dependencies
 
 ## Limitations
+
 - Sequential execution only
 - No complex branching logic
 - Limited control over tool execution flow

@@ -58,6 +58,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        template: ${template}
     depends_on:
       - redis
       - litellm
@@ -67,19 +69,15 @@ services:
       - LITELLM_GATEWAY_URL=${LITELLM_GATEWAY_URL}
       - LITELLM_GATEWAY_API_KEY=${LITELLM_GATEWAY_API_KEY}
       - REDIS_URL=${REDIS_URL}
-    container_name: langfold-backend
+    container_name: langfold-${template}
     ports:
       - "${LANGFOLD_PORT:-21120}:21120"
     volumes:
-      - .:/app
+      - ./templates/${template}:/app
       - /app/.venv
-      - models_cache:/app/cache
     networks:
       - langfold-network
 
 networks:
   langfold-network:
     external: false
-
-volumes:
-  models_cache:
