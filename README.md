@@ -32,15 +32,29 @@ uv sync
 
 - The project is divided into templates, situated in the [templates](./templates) directory. Each template has its own README.md file.
 
+- Entire project is dockerized. You can use the Makefile to build, start, and stop the project. If `make` is not installed, you can copy the commands from the Makefile and run them manually.
+
 - To restart an existing template, run:
 
-```bash
-make up t=<template-folder-name>
-```
+  ```bash
+  make up t=<template-folder-name>
+  ```
+
+- Example:
+
+  ```bash
+  make up t=custom-react-agent
+  ```
+
+  OR
+
+  ```bash
+  template=custom-react-agent docker-compose --env-file .env up -d
+  ```
 
 - To build a new template, run:
 
-```bash
-make down t=<old-template-folder-name>
-make build t=<new-template-folder-name>
-```
+  ```bash
+  make down t=<old-template-folder-name>
+  make build t=<new-template-folder-name>
+  ```
