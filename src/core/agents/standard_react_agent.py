@@ -8,7 +8,7 @@ from src.utils.chat import print_event, get_ai_response
 from src.utils.logger import logger
 
 
-async def run_react_agent(user_input: str):
+async def run_react_agent(thread_id: str, user_input: str, config: dict):
     """
     Run the standard react agent workflow.
 
@@ -18,8 +18,7 @@ async def run_react_agent(user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-    settings = Settings()
-    prompt = settings.AGENT_CONFIG.get("prompt", "You are a helpful assistant.")
+    prompt = config.get("prompt", "You are a helpful assistant.")
     logger.debug(f"System Prompt for React Agent: {prompt}")
 
     # Create the React agent

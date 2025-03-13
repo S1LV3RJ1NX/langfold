@@ -1,11 +1,12 @@
-from src.config import Settings
+from .config import agent_configs
+from src.config import settings
 import importlib
 
 # Cache for imported agent functions
 _AGENT_CACHE = {}
 
 
-async def run_agent(thread_id: str, user_input: str):
+async def run_agent(thread_id: str, user_input: str, agent=settings.PRIMARY_CONFIG):
     """
     Asynchronously runs the agent's workflow based on user input.
 
@@ -21,7 +22,8 @@ async def run_agent(thread_id: str, user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-    agent_type = Settings().AGENT_CONFIG.get("type")
+    agent_config = agent_configs.get_config(agent)
+    agent_type = agent_config.get("type")
 
     # Try to get from cache first
     if agent_type in _AGENT_CACHE:
@@ -45,14 +47,16 @@ async def run_agent(thread_id: str, user_input: str):
 
         # Dynamically import the module
         module = importlib.import_module(module_path)
-        agent_function = getattr(module, function_name)
+        agent_function = lambda *args, **kwargs: getattr(module, function_name)(
+            *args, **kwargs, config=agent_config
+        )
 
         # Cache for future use
         _AGENT_CACHE[agent_type] = agent_function
 
     # Call with appropriate arguments based on the agent type explicitly
     if agent_type == "react_agent":
-        return await agent_function(user_input)
+        return await agent_function(thread_id, user_input)
     elif agent_type == "custom_react_agent":
         return await agent_function(thread_id, user_input)
     else:

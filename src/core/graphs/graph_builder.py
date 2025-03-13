@@ -18,6 +18,7 @@ from importlib import import_module
 from src.config import settings
 from src.utils.logger import logger
 from src.core.graphs.graph import convert_special_nodes
+from src.core.agents.config import agent_configs
 
 
 class GraphBuilder:
@@ -51,7 +52,8 @@ class GraphBuilder:
     def _initialize(self):
         """Initialize the graph builder with a new StateGraph and configuration"""
         self.workflow = StateGraph(AgentState)
-        self.agent_config = settings.AGENT_CONFIG
+        self.agent_configs = agent_configs.all_agent_configs
+        self.primary_agent_config = agent_configs.get_primary_config
         self.memory_checkpointer = MemorySaver()
 
     def _add_nodes(self):
@@ -59,83 +61,91 @@ class GraphBuilder:
         Add processing nodes to the graph from configuration.
         Each node is a Python module with a function matching the node name.
         """
-        for node in self.agent_config["nodes"]:
-            try:
-                # Dynamically import the node's module and get its function
-                module = import_module(f"src.core.nodes.{node['name']}")
-                node_function = getattr(module, node["name"])
-                self.workflow.add_node(node["name"], node_function)
-                logger.debug(f"Successfully added node: {node['name']}")
-            except ModuleNotFoundError as e:
-                logger.error(f"Node module not found: {node['name']}. Error: {e}")
-                raise
-            except AttributeError as e:
-                logger.error(
-                    f"Node function/class not found in module: {node['name']}. Error: {e}"
-                )
-                raise
-            except Exception as e:
-                logger.error(f"Error adding node {node['name']}: {e}")
-                raise
+        for agent_config in self.agent_configs.values():
+            for node in agent_config["nodes"]:
+                try:
+                    # Dynamically import the node's module and get its function
+                    module = import_module(f"src.core.nodes.{node['name']}")
+                    node_function = getattr(module, node["name"])
+                    self.workflow.add_node(node["name"], node_function)
+                    logger.debug(f"Successfully added node: {node['name']}")
+                except ModuleNotFoundError as e:
+                    logger.error(f"Node module not found: {node['name']}. Error: {e}")
+                    raise
+                except AttributeError as e:
+                    logger.error(
+                        f"Node function/class not found in module: {node['name']}. Error: {e}"
+                    )
+                    raise
+                except Exception as e:
+                    logger.error(f"Error adding node {node['name']}: {e}")
+                    raise
 
     def _add_edges(self):
         """
         Add direct edges between nodes from configuration.
         Each edge represents a direct transition from one node to another.
         """
-        for edge in self.agent_config["edges"]:
-            try:
-                self.workflow.add_edge(
-                    convert_special_nodes(edge["from"]),
-                    convert_special_nodes(edge["to"]),
-                )
-                logger.debug(f"Successfully added edge: {edge['from']} -> {edge['to']}")
-            except Exception as e:
-                logger.error(f"Error adding edge {edge['from']} -> {edge['to']}: {e}")
-                raise
+        for agent_config in self.agent_configs.values():
+            for edge in agent_config["edges"]:
+                try:
+                    self.workflow.add_edge(
+                        convert_special_nodes(edge["from"]),
+                        convert_special_nodes(edge["to"]),
+                    )
+                    logger.debug(
+                        f"Successfully added edge: {edge['from']} -> {edge['to']}"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Error adding edge {edge['from']} -> {edge['to']}: {e}"
+                    )
+                    raise
 
     def _add_conditional_edges(self):
         """
         Add conditional edges from configuration.
         Each conditional edge uses a condition function to determine the next node.
         """
-        for cond_edge in self.agent_config["conditional_edges"]:
-            try:
-                # Import condition function and set up mapping of outcomes to next nodes
-                module = import_module(f"src.core.nodes.{cond_edge['condition']}")
-                mapping = {
-                    k: convert_special_nodes(v) for k, v in cond_edge["mapping"].items()
-                }
-                self.workflow.add_conditional_edges(
-                    convert_special_nodes(cond_edge["from"]),
-                    getattr(module, cond_edge["condition"]),
-                    mapping,
-                )
-                logger.debug(
-                    f"Successfully added conditional edge from: {cond_edge['from']}"
-                )
-            except ModuleNotFoundError as e:
-                logger.error(
-                    f"Condition module not found: {cond_edge['condition']}. Error: {e}"
-                )
-                raise
-            except AttributeError as e:
-                logger.error(
-                    f"Condition function/class not found in module: {cond_edge['condition']}. Error: {e}"
-                )
-                raise
-            except Exception as e:
-                logger.error(
-                    f"Error adding conditional edge from {cond_edge['from']}: {e}"
-                )
-                raise
+        for agent_config in self.agent_configs.values():
+            for cond_edge in agent_config["conditional_edges"]:
+                try:
+                    # Import condition function and set up mapping of outcomes to next nodes
+                    module = import_module(f"src.core.nodes.{cond_edge['condition']}")
+                    mapping = {
+                        k: convert_special_nodes(v)
+                        for k, v in cond_edge["mapping"].items()
+                    }
+                    self.workflow.add_conditional_edges(
+                        convert_special_nodes(cond_edge["from"]),
+                        getattr(module, cond_edge["condition"]),
+                        mapping,
+                    )
+                    logger.debug(
+                        f"Successfully added conditional edge from: {cond_edge['from']}"
+                    )
+                except ModuleNotFoundError as e:
+                    logger.error(
+                        f"Condition module not found: {cond_edge['condition']}. Error: {e}"
+                    )
+                    raise
+                except AttributeError as e:
+                    logger.error(
+                        f"Condition function/class not found in module: {cond_edge['condition']}. Error: {e}"
+                    )
+                    raise
+                except Exception as e:
+                    logger.error(
+                        f"Error adding conditional edge from {cond_edge['from']}: {e}"
+                    )
+                    raise
 
     def _set_entry_point(self):
         """Set the starting node for the workflow from configuration"""
         try:
-            self.workflow.set_entry_point(self.agent_config["entry_point"])
+            self.workflow.set_entry_point(self.primary_agent_config["entry_point"])
             logger.debug(
-                f"Successfully set entry point: {self.agent_config['entry_point']}"
+                f"Successfully set entry point: {self.primary_agent_config['entry_point']}"
             )
         except Exception as e:
             logger.error(f"Error setting entry point: {e}")

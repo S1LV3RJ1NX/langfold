@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 
+from src.controller import chat
 from src.models.user_input import UserInput
 
 from src.core.agents import run_agent
@@ -51,7 +52,4 @@ class HealthCheck(logging.Filter):
 # Filter out /health-check
 logging.getLogger("uvicorn.access").addFilter(HealthCheck())
 
-
-@app.post("/chat")
-async def run_agent_endpoint(user_input: UserInput):
-    return await run_agent(user_input.thread_id, user_input.user_input)
+app.include_router(chat.router)

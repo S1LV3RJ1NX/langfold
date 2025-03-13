@@ -3,7 +3,7 @@ from importlib import import_module
 from inspect import getmembers
 from langchain_core.tools import BaseTool
 
-from src.config import Settings
+from src.core.agents.config import agent_configs
 from src.utils.logger import logger
 
 
@@ -23,52 +23,53 @@ def auto_register_tools():
             - tools_by_name (dict): A dictionary mapping tool names to their instances.
     """
     # Get the configuration from settings
-    config = Settings().AGENT_CONFIG
-
-    # Get tool specifications from the configuration
-    tool_specs = config.get("tools", [])
-
-    # Create a set of tool names for efficient lookup
-    tool_names = {tool_spec["name"] for tool_spec in tool_specs}
-
-    if not tool_names:
-        logger.warning(
-            "No tools specified in configuration. No tools will be registered."
-        )
-        return [], {}
-
-    logger.info(f"Registering tools: {tool_names}")
+    configs = agent_configs.all_agent_configs
 
     # Initialize collections for registered tools
     tools = []
     tools_by_name = {}
 
-    # Path to the tools directory
-    tools_dir = Path(__file__).parent
+    for config in configs.values():
+        # Get tool specifications from the configuration
+        tool_specs = config.get("tools", [])
 
-    # Dynamically import and register tools
-    for file in tools_dir.glob("*.py"):
-        if file.name in ["__init__.py", "tool_registry.py"]:
-            continue  # Skip initialization files
+        # Create a set of tool names for efficient lookup
+        tool_names = {tool_spec["name"] for tool_spec in tool_specs}
 
-        module_name = f"src.tools.{file.stem}"
-        try:
-            # Import the module
-            module = import_module(module_name)
+        if not tool_names:
+            logger.warning(
+                "No tools specified in configuration. No tools will be registered."
+            )
+            return [], {}
 
-            # Find BaseTool instances in the module
-            for _, obj in getmembers(module):
-                if isinstance(obj, BaseTool) and obj.name in tool_names:
-                    tools.append(obj)
-                    tools_by_name[obj.name] = obj
-                    logger.debug(f"Registered tool: {obj.name}")
-        except ImportError as e:
-            logger.error(f"Error importing {module_name}: {e}")
+        logger.info(f"Registering tools: {tool_names}")
 
-    # Log summary of registered tools
-    if tools:
-        logger.info(f"Successfully registered {len(tools)} tools")
-    else:
-        logger.warning("No tools were registered")
+        # Path to the tools directory
+        tools_dir = Path(__file__).parent
+
+        # Dynamically import and register tools
+        for file in tools_dir.glob("*.py"):
+            if file.name in ["__init__.py", "tool_registry.py"]:
+                continue  # Skip initialization files
+
+            module_name = f"src.tools.{file.stem}"
+            try:
+                # Import the module
+                module = import_module(module_name)
+
+                # Find BaseTool instances in the module
+                for _, obj in getmembers(module):
+                    if isinstance(obj, BaseTool) and obj.name in tool_names:
+                        tools.append(obj)
+                        tools_by_name[obj.name] = obj
+                        logger.debug(f"Registered tool: {obj.name}")
+            except ImportError as e:
+                logger.error(f"Error importing {module_name}: {e}")
+
+        # Log summary of registered tools
+        if tools:
+            logger.info(f"Successfully registered {len(tools)} tools")
+        else:
+            logger.warning("No tools were registered")
 
     return tools, tools_by_name
