@@ -1,9 +1,4 @@
-from src.config import Settings
-import importlib
-
-# Cache for imported agent functions
-_AGENT_CACHE = {}
-
+from .custom_react_agent import run_custom_react_agent
 
 async def run_agent(thread_id: str, user_input: str):
     """
@@ -21,41 +16,6 @@ async def run_agent(thread_id: str, user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-    agent_type = Settings().AGENT_CONFIG.get("type")
-
-    # Try to get from cache first
-    if agent_type in _AGENT_CACHE:
-        agent_function = _AGENT_CACHE[agent_type]
-    else:
-        # Map agent types to their module paths and function names
-        agent_modules = {
-            "custom_react_agent": (
-                "src.core.agents.custom_react_agent",
-                "run_custom_react_agent",
-            ),
-            "react_agent": ("src.core.agents.standard_react_agent", "run_react_agent"),
-        }
-
-        if agent_type not in agent_modules:
-            raise ValueError(
-                f"Invalid agent type: {agent_type}. Available types: {list(agent_modules.keys())}"
-            )
-
-        module_path, function_name = agent_modules[agent_type]
-
-        # Dynamically import the module
-        module = importlib.import_module(module_path)
-        agent_function = getattr(module, function_name)
-
-        # Cache for future use
-        _AGENT_CACHE[agent_type] = agent_function
-
-    # Call with appropriate arguments based on the agent type explicitly
-    if agent_type == "react_agent":
-        return await agent_function(user_input)
-    elif agent_type == "custom_react_agent":
-        return await agent_function(thread_id, user_input)
-    else:
-        raise ValueError(
-            f"Invalid agent type: {agent_type}. Available types: {list(agent_modules.keys())}"
-        )
+    
+    return await run_custom_react_agent(thread_id, user_input)
+    
