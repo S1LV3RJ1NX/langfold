@@ -12,7 +12,6 @@ The graph is built once and cached for subsequent access.
 
 from src.core.agents.model_provider import MODEL
 from src.tools import TOOLS
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from src.config import settings
@@ -75,10 +74,8 @@ class GraphBuilder:
         """
         if instance._graph is None:
             prompt = settings.AGENT_CONFIG.get("prompt", "You are a helpful assistant.")
-            checkpointer_type = settings.AGENT_CONFIG.get(
-                "checkpointer.type", "in_memory"
-            )
-            checkpointer_kwargs = settings.AGENT_CONFIG.get("checkpointer.kwargs", {})
+            checkpointer_type = settings.get("checkpointer.type", "in_memory")
+            checkpointer_kwargs = settings.get("checkpointer.kwargs", {})
 
             # Create checkpointer
             instance.checkpointer = await CheckpointerFactory.create_checkpointer(
@@ -112,6 +109,4 @@ class GraphBuilder:
         return await cls._build(instance)
 
 
-# # Initialize and export the singleton graph instance
-# GRAPH = GraphBuilder.build()
 GRAPH = None

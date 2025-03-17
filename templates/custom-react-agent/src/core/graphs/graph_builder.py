@@ -11,13 +11,14 @@ The graph is built once and cached for subsequent access.
 """
 
 from langgraph.graph import StateGraph
+from langgraph.graph.graph import CompiledGraph
 from src.models.state import AgentState
-from langgraph.checkpoint.memory import MemorySaver
 from importlib import import_module
 
 from src.config import settings
 from src.utils.logger import logger
 from src.core.graphs.utils import convert_special_nodes
+from src.utils.checkpointer_factory import CheckpointerFactory
 
 
 class GraphBuilder:
@@ -52,8 +53,20 @@ class GraphBuilder:
         """Initialize the graph builder with a new StateGraph and configuration"""
         self.workflow = StateGraph(AgentState)
         self.agent_config = settings.AGENT_CONFIG
-        # TODO: Add a checkpointer util
-        self.memory_checkpointer = MemorySaver()
+        self.checkpointer = None
+
+    @classmethod
+    async def get_graph(cls):
+        """
+        Get the initialized graph instance. If not initialized, wait for initialization.
+
+        Returns:
+            Graph: The compiled workflow graph
+        """
+        instance = cls()
+        if instance._graph is None:
+            instance._graph = await cls._build(instance)
+        return instance._graph
 
     def _add_nodes(self):
         """
@@ -143,7 +156,7 @@ class GraphBuilder:
             raise
 
     @staticmethod
-    def _build(instance):
+    async def _build(instance) -> CompiledGraph:
         """
         Build and compile the workflow graph if not already built.
 
@@ -160,10 +173,18 @@ class GraphBuilder:
             instance._add_conditional_edges()
             instance._set_entry_point()
 
+            checkpointer_type = settings.get("checkpointer.type", "in_memory")
+            checkpointer_kwargs = settings.get("checkpointer.kwargs", {})
+
+            # Create checkpointer
+            instance.checkpointer = await CheckpointerFactory.create_checkpointer(
+                checkpointer_type, **checkpointer_kwargs
+            )
+
             try:
                 # Compile the graph with checkpointing
                 instance._graph = instance.workflow.compile(
-                    checkpointer=instance.memory_checkpointer
+                    checkpointer=instance.checkpointer
                 )
                 logger.info("Graph compiled successfully")
             except Exception as e:
@@ -173,7 +194,7 @@ class GraphBuilder:
         return instance._graph
 
     @classmethod
-    def build(cls):
+    async def build(cls):
         """
         Build and return the workflow graph (entry point).
 
@@ -181,8 +202,7 @@ class GraphBuilder:
             Graph: The compiled workflow graph
         """
         instance = cls()
-        return cls._build(instance)
+        return await cls._build(instance)
 
 
-# Initialize and export the singleton graph instance
-GRAPH = GraphBuilder.build()
+GRAPH = None
