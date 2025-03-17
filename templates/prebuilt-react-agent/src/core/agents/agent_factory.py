@@ -1,7 +1,5 @@
-from src.config import settings
 from src.utils.chat import print_event, get_ai_response
-from src.utils.logger import logger
-from src.core.graphs.graph_builder import GRAPH
+from src.core.graphs.graph_builder import GraphBuilder
 
 
 async def run_agent(thread_id: str, user_input: str):
@@ -21,11 +19,12 @@ async def run_agent(thread_id: str, user_input: str):
         dict: A dictionary containing the AI's response.
     """
 
+    graph = await GraphBuilder.get_graph()
     config = {"configurable": {"thread_id": thread_id}}
     inputs = {"messages": [("user", user_input)]}
     events = []
 
-    async for event in GRAPH.astream(inputs, config=config, stream_mode="values"):
+    async for event in graph.astream(inputs, config=config, stream_mode="values"):
         print_event(event)
         events.append(event)
 

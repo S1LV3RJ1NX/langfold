@@ -1,6 +1,6 @@
 from src.config import settings
 from src.utils.chat import print_event, get_ai_response
-from src.core.graphs.graph_builder import GRAPH
+from src.core.graphs.graph_builder import GraphBuilder
 from src.utils.logger import logger
 
 
@@ -20,7 +20,7 @@ async def run_agent(thread_id: str, user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-
+    graph = await GraphBuilder.get_graph()
     prompt = settings.AGENT_CONFIG.get("prompt", "You are a helpful assistant.")
     logger.debug(f"System Prompt for custom React Agent: {prompt}")
 
@@ -28,7 +28,7 @@ async def run_agent(thread_id: str, user_input: str):
     inputs = {"messages": [("user", user_input), ("system", prompt)]}
     events = []
 
-    async for event in GRAPH.astream(inputs, config=config, stream_mode="values"):
+    async for event in graph.astream(inputs, config=config, stream_mode="values"):
         print_event(event)
         events.append(event)
 
