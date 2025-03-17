@@ -24,9 +24,10 @@ conditional_edges:
       tool_node: tool_node
       end: END
 tools:
-  - name: get_username
-    description: "Use this tool when user asks for their username."
+  - name: get_weather
+    description: "Use this tool to get weather information."
     arguments:
       type: object
-      properties: {}
-      required: []
+      properties:
+        location:
+          type: string

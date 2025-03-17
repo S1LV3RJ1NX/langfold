@@ -17,7 +17,7 @@ from importlib import import_module
 
 from src.config import settings
 from src.utils.logger import logger
-from src.core.graphs.graph import convert_special_nodes
+from src.core.graphs.utils import convert_special_nodes
 
 
 class GraphBuilder:
@@ -52,6 +52,7 @@ class GraphBuilder:
         """Initialize the graph builder with a new StateGraph and configuration"""
         self.workflow = StateGraph(AgentState)
         self.agent_config = settings.AGENT_CONFIG
+        # TODO: Add a checkpointer util
         self.memory_checkpointer = MemorySaver()
 
     def _add_nodes(self):

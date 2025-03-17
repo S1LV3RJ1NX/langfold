@@ -8,9 +8,10 @@ prompt: >-
   4. Acknowledge if you're unsure about something
   5. Focus on addressing the core of the user's question
 tools:
-  - name: get_username
-    description: "Use this tool when user asks for their username."
+  - name: get_weather
+    description: "Use this tool to get weather information."
     arguments:
       type: object
-      properties: {}
-      required: []
+      properties:
+        location:
+          type: string

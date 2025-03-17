@@ -3,7 +3,7 @@ from importlib import import_module
 from inspect import getmembers
 from langchain_core.tools import BaseTool
 
-from src.config import Settings
+from src.config import settings
 from src.utils.logger import logger
 
 
@@ -23,7 +23,7 @@ def auto_register_tools():
             - tools_by_name (dict): A dictionary mapping tool names to their instances.
     """
     # Get the configuration from settings
-    config = Settings().AGENT_CONFIG
+    config = settings.AGENT_CONFIG
 
     # Get tool specifications from the configuration
     tool_specs = config.get("tools", [])

@@ -1,4 +1,8 @@
-from .standard_react_agent import run_react_agent
+from src.config import settings
+from src.utils.chat import print_event, get_ai_response
+from src.utils.logger import logger
+from src.core.graphs.graph_builder import GRAPH
+
 
 async def run_agent(thread_id: str, user_input: str):
     """
@@ -16,6 +20,14 @@ async def run_agent(thread_id: str, user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-    
-    return await run_react_agent(user_input)
-    
+
+    config = {"configurable": {"thread_id": thread_id}}
+    inputs = {"messages": [("user", user_input)]}
+    events = []
+
+    async for event in GRAPH.astream(inputs, config=config, stream_mode="values"):
+        print_event(event)
+        events.append(event)
+
+    response = await get_ai_response(events)
+    return {"response": response}
