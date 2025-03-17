@@ -15,3 +15,7 @@ tools:
       properties:
         location:
           type: string
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}

@@ -31,3 +31,8 @@ tools:
       properties:
         location:
           type: string
+
+checkpointer:
+  type: "redis"
+  kwargs:
+    max_connections: 10

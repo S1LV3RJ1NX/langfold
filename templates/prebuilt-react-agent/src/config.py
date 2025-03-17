@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     LITELLM_GATEWAY_URL: str
     LITELLM_GATEWAY_API_KEY: str
 
+    REDIS_URL: str
+
     AGENT_CONFIG: str = os.path.join(
         os.path.dirname(os.path.dirname(__file__)), "agent.yaml"
     )
@@ -32,6 +34,28 @@ class Settings(BaseSettings):
     def load_agent_config(cls, v):
         with open(v, "r") as f:
             return yaml.safe_load(f)
+
+    def get(self, key_path: str, default=None):
+        """
+        Get a value from nested dictionary using dot notation
+
+        Args:
+            key_path (str): Path to the key using dot notation (e.g., "checkpointer.type")
+            default: Default value if key doesn't exist
+
+        Returns:
+            The value at the specified path or the default value
+        """
+        keys = key_path.split(".")
+        value = self.AGENT_CONFIG
+
+        for key in keys:
+            if isinstance(value, dict):
+                value = value.get(key, default)
+            else:
+                return default
+
+        return value if value is not None else default
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="allow"
