@@ -17,6 +17,7 @@ from langgraph.prebuilt import create_react_agent
 
 from src.config import settings
 from src.utils.logger import logger
+from src.utils.checkpointer_factory import CheckpointerFactory
 
 
 class GraphBuilder:
@@ -46,11 +47,23 @@ class GraphBuilder:
     def _initialize(self):
         """Initialize the graph builder with a new StateGraph and configuration"""
         self.agent_config = settings.AGENT_CONFIG
-        # TODO: Add a checkpointer util
-        self.checkpointer = MemorySaver()
+        self.checkpointer = None
+
+    @classmethod
+    async def get_graph(cls):
+        """
+        Get the initialized graph instance. If not initialized, wait for initialization.
+
+        Returns:
+            Graph: The compiled workflow graph
+        """
+        instance = cls()
+        if instance._graph is None:
+            instance._graph = await cls._build(instance)
+        return instance._graph
 
     @staticmethod
-    def _build(instance):
+    async def _build(instance):
         """
         Build and compile the workflow graph if not already built.
 
@@ -62,6 +75,16 @@ class GraphBuilder:
         """
         if instance._graph is None:
             prompt = settings.AGENT_CONFIG.get("prompt", "You are a helpful assistant.")
+            checkpointer_type = settings.AGENT_CONFIG.get(
+                "checkpointer.type", "in_memory"
+            )
+            checkpointer_kwargs = settings.AGENT_CONFIG.get("checkpointer.kwargs", {})
+
+            # Create checkpointer
+            instance.checkpointer = await CheckpointerFactory.create_checkpointer(
+                checkpointer_type, **checkpointer_kwargs
+            )
+
             try:
                 # Compile the graph with checkpointing
                 instance._graph = create_react_agent(
@@ -78,7 +101,7 @@ class GraphBuilder:
         return instance._graph
 
     @classmethod
-    def build(cls):
+    async def build(cls):
         """
         Build and return the workflow graph (entry point).
 
@@ -86,8 +109,9 @@ class GraphBuilder:
             Graph: The compiled workflow graph
         """
         instance = cls()
-        return cls._build(instance)
+        return await cls._build(instance)
 
 
-# Initialize and export the singleton graph instance
-GRAPH = GraphBuilder.build()
+# # Initialize and export the singleton graph instance
+# GRAPH = GraphBuilder.build()
+GRAPH = None

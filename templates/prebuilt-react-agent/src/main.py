@@ -2,15 +2,39 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
-
+from contextlib import asynccontextmanager
 from src.models.user_input import UserInput
 
 from src.core.agents import run_agent
 from src.utils.logger import logger
+from src.core.graphs.graph_builder import GraphBuilder, GRAPH
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Context manager for managing the lifespan of the FastAPI application.
+
+    Args:
+        app (FastAPI): The FastAPI application instance.
+
+    Yields:
+        None: This is where FastAPI runs.
+
+    """
+    global GRAPH
+    if GRAPH is None:
+        logger.info("Building graph")
+        GRAPH = await GraphBuilder.build()
+
+    yield  # This is where FastAPI runs
+    logger.info("Shutting down")
+
 
 app = FastAPI(
     title="Backend for Agent",
     docs_url="/",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
