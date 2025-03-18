@@ -18,7 +18,6 @@ async def run_agent(thread_id: str, user_input: str):
     Returns:
         dict: A dictionary containing the AI's response.
     """
-
     graph = await GraphBuilder.get_graph()
     config = {"configurable": {"thread_id": thread_id}}
     inputs = {"messages": [("user", user_input)]}

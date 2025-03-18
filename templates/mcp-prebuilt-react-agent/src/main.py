@@ -20,14 +20,13 @@ async def lifespan(app: FastAPI):
 
     Yields:
         None: This is where FastAPI runs.
-
     """
     global GRAPH
     if GRAPH is None:
         logger.info("Building graph")
         GRAPH = await GraphBuilder.build()
 
-    yield  # This is where FastAPI runs
+    yield
     logger.info("Shutting down")
 
 

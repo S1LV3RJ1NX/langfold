@@ -8,9 +8,23 @@ prompt: >-
   4. Acknowledge if you're unsure about something
   5. Focus on addressing the core of the user's question
 
-# TODO: Add MCP Servers path
+tools:
+  - name: get_weather
+    description: "Use this tool to get weather information."
+    arguments:
+      type: object
+      properties:
+        location:
+          type: string
+
 mcp_servers:
-  - src.mcp_servers.math_server
+  # type: python / url
+  - type: python
+    name: math_server
+    path: src.mcp_servers.math_server
+  # - type: url
+  #   name: weather_server
+  #   url: http://localhost:8000/sse
 
 checkpointer:
   type: "in_memory"

@@ -4,15 +4,29 @@ mcp = FastMCP("Math")
 
 
 @mcp.tool()
-def add(a: int, b: int) -> int:
+async def add(a: float, b: float) -> float:
     """Add two numbers"""
     return a + b
 
 
 @mcp.tool()
-def multiply(a: int, b: int) -> int:
+async def multiply(a: float, b: float) -> float:
     """Multiply two numbers"""
     return a * b
+
+
+@mcp.tool()
+async def subtract(a: float, b: float) -> float:
+    """Subtract two numbers"""
+    return a - b
+
+
+@mcp.tool()
+async def divide(a: float, b: float) -> float:
+    """Divide two numbers"""
+    if b == 0:
+        return 0
+    return a / b
 
 
 if __name__ == "__main__":
