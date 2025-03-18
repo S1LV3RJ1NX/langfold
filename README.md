@@ -8,7 +8,7 @@ LangFold is a production grade scaffolding framework for building LLM powered ag
 
 - Install uv: https://docs.astral.sh/uv/getting-started/installation/
 
-- Sync the project dependencies
+- Sync the project dependencies or whenever you pull new changes
 
 ```bash
 uv sync
