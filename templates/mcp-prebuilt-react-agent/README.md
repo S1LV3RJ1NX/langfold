@@ -1,8 +1,8 @@
-# React Agent Implementation Guide
+# React Agent with MCP Implementation Guide
 
 ## Overview
 
-The React Agent is a standard implementation based on LangGraph's React pattern. It provides a simpler, more straightforward approach for building agents that need to interact with tools in a sequential manner.
+The React Agent is a standard implementation based on LangGraph's React pattern. It provides a simpler, more straightforward approach for building agents that need to interact with tools in a sequential manner. This implementation also includes MCP servers for tool execution.
 
 ## When to Use React Agent
 
@@ -48,11 +48,23 @@ tools:
       properties:
         arg1:
           type: string
-          description: "Description of argument 1"
         arg2:
           type: integer
-          description: "Description of argument 2"
-      required: ["arg1"]
+
+mcp_servers:
+  # type: python / url
+  - type: python
+    name: math_server
+    # path to the python file that contains the MCP server
+    # Ideally, store all local MCP servers in the src/mcp_servers folder
+    path: src.mcp_servers.math_server
+  # - type: url
+  #   name: weather_server
+  #   url: http://localhost:8000/sse
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}
 ```
 
 ## Implementation Details
@@ -62,6 +74,12 @@ tools:
 1. **Agent Configuration**: Defined in `agent.yaml`
 2. **Tool Registry**: Automatically loads tools specified in configuration
 3. **Response Generation**: Handles the agent's responses and tool interactions
+4. **Checkpointer**
+   - Used to save and restore agent state
+   - Supports in-memory or redis backend
+5. **MCP Servers**
+   - Used to execute tools
+   - Supports python or url backend
 
 ### Flow
 

@@ -48,11 +48,11 @@ tools:
       properties:
         arg1:
           type: string
-          description: "Description of argument 1"
         arg2:
           type: integer
-          description: "Description of argument 2"
-      required: ["arg1"]
+checkpointer:
+  type: "in_memory"
+  kwargs: {}
 ```
 
 ## Implementation Details
@@ -62,6 +62,10 @@ tools:
 1. **Agent Configuration**: Defined in `agent.yaml`
 2. **Tool Registry**: Automatically loads tools specified in configuration
 3. **Response Generation**: Handles the agent's responses and tool interactions
+
+4. **Checkpointer**
+   - Used to save and restore agent state
+   - Supports in-memory or redis backend
 
 ### Flow
 

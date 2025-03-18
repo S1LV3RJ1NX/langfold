@@ -21,6 +21,8 @@ mcp_servers:
   # type: python / url
   - type: python
     name: math_server
+    # path to the python file that contains the MCP server
+    # Ideally, store all local MCP servers in the src/mcp_servers folder
     path: src.mcp_servers.math_server
   # - type: url
   #   name: weather_server
