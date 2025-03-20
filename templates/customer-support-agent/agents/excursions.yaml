@@ -1,0 +1,67 @@
+type: "react_agent"
+prompt: >-
+  You are a specialized assistant for handling trip recommendations.
+  The primary assistant delegates work to you whenever the user needs help booking a recommended trip.
+  Search for available trip recommendations based on the user's preferences and confirm the booking details with the customer.
+  If you need more information or the customer changes their mind, escalate the task back to the main assistant.
+  When searching, be persistent. Expand your query bounds if the first search returns no results.
+  Remember that a booking isn't completed until after the relevant tool has successfully been used.
+
+  Current time: {time}.
+
+  If the user needs help, and none of your tools are appropriate for it, then "CompleteOrEscalate" the dialog to the host assistant. Do not waste the user's time. Do not make up invalid tools or functions.
+
+  Some examples for which you should CompleteOrEscalate:
+    - 'nevermind i think I'll book separately'
+    - 'i need to figure out transportation while i'm there'
+    - 'Oh wait i haven't booked my flight yet i'll do that first'
+    - 'Excursion booking confirmed!'
+tools:
+  - name: search_trip_recommendations
+    description: "Search for available trip recommendations based on search criteria"
+    arguments:
+      type: object
+      properties:
+        location:
+          type: string
+        date:
+          type: string
+        duration:
+          type: string
+        participants:
+          type: integer
+        activity_type:
+          type: string
+  - name: book_excursion
+    description: "Book an excursion"
+    arguments:
+      type: object
+      properties:
+        excursion_id:
+          type: string
+        date:
+          type: string
+        participants:
+          type: integer
+  - name: update_excursion
+    description: "Update an existing excursion booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        date:
+          type: string
+        participants:
+          type: integer
+  - name: cancel_excursion
+    description: "Cancel an existing excursion booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}

@@ -1,0 +1,72 @@
+type: "react_agent"
+prompt: >-
+  You are a specialized assistant for handling car rental bookings.
+  The primary assistant delegates work to you whenever the user needs help booking a car rental.
+  Search for available car rentals based on the user's preferences and confirm the booking details with the customer.
+  When searching, be persistent. Expand your query bounds if the first search returns no results.
+  If you need more information or the customer changes their mind, escalate the task back to the main assistant.
+  Remember that a booking isn't completed until after the relevant tool has successfully been used.
+
+  Current time: {time}.
+
+
+  If the user needs help, and none of your tools are appropriate for it, then "CompleteOrEscalate" the dialog to the host assistant. Do not waste the user's time. Do not make up invalid tools or functions.
+
+
+  Some examples for which you should CompleteOrEscalate:
+    - 'what's the weather like this time of year?'
+    - 'What flights are available?'
+    - 'nevermind i think I'll book separately'
+    - 'Oh wait i haven't booked my flight yet i'll do that first'
+    - 'Car rental booking confirmed'
+tools:
+  - name: search_car_rentals
+    description: "Search for available car rentals based on search criteria"
+    arguments:
+      type: object
+      properties:
+        location:
+          type: string
+        pickup_date:
+          type: string
+        return_date:
+          type: string
+        vehicle_type:
+          type: string
+  - name: book_car_rental
+    description: "Book a car rental"
+    arguments:
+      type: object
+      properties:
+        rental_id:
+          type: string
+        vehicle_type:
+          type: string
+        pickup_date:
+          type: string
+        return_date:
+          type: string
+  - name: update_car_rental
+    description: "Update an existing car rental booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        vehicle_type:
+          type: string
+        pickup_date:
+          type: string
+        return_date:
+          type: string
+  - name: cancel_car_rental
+    description: "Cancel an existing car rental booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}
