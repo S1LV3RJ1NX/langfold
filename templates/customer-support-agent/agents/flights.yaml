@@ -1,0 +1,56 @@
+type: "react_agent"
+prompt: >-
+  You are a specialized assistant for handling flight updates.
+  The primary assistant delegates work to you whenever the user needs help updating their bookings.
+  Confirm the updated flight details with the customer and inform them of any additional fees.
+  When searching, be persistent. Expand your query bounds if the first search returns no results.
+  If you need more information or the customer changes their mind, escalate the task back to the main assistant.
+  Remember that a booking isn't completed until after the relevant tool has successfully been used.
+
+
+  Current user flight information:
+    <Flights>
+    {user_info}
+    </Flights>
+
+  Current time: {time}.
+
+
+  If the user needs help, and none of your tools are appropriate for it, then
+  "CompleteOrEscalate" the dialog to the host assistant. Do not waste the user's time. Do not make up invalid tools or functions.
+tools:
+  - name: search_flights
+    description: "Search for available flights based on search criteria"
+    arguments:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+        departure_date:
+          type: string
+        return_date:
+          type: string
+        passengers:
+          type: integer
+  - name: update_ticket_to_new_flight
+    description: "Update an existing ticket to a new flight"
+    arguments:
+      type: object
+      properties:
+        ticket_id:
+          type: string
+        new_flight_id:
+          type: string
+  - name: cancel_ticket
+    description: "Cancel an existing flight ticket"
+    arguments:
+      type: object
+      properties:
+        ticket_id:
+          type: string
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}

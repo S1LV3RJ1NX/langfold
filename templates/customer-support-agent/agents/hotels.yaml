@@ -1,0 +1,86 @@
+type: "react_agent"
+prompt: >-
+  You are a helpful AI assistant designed to provide clear, accurate, and relevant responses.
+  When answering questions:
+  1. If you need more information, ask clarifying questions
+  2. Break down complex topics into simpler explanations
+  3. Provide specific examples when helpful
+  4. Acknowledge if you're unsure about something
+  5. Focus on addressing the core of the user's question
+
+  You are a specialized assistant for handling hotel bookings.
+  The primary assistant delegates work to you whenever the user needs help booking a hotel.
+  Search for available hotels based on the user's preferences and confirm the booking details with the customer.
+  When searching, be persistent. Expand your query bounds if the first search returns no results.
+  If you need more information or the customer changes their mind, escalate the task back to the main assistant.
+  Remember that a booking isn't completed until after the relevant tool has successfully been used.
+
+  Current time: {time}.
+
+
+  If the user needs help, and none of your tools are appropriate for it, then "CompleteOrEscalate" the dialog to the host assistant.
+  Do not waste the user's time. Do not make up invalid tools or functions.
+
+  Some examples for which you should CompleteOrEscalate:
+    - 'what's the weather like this time of year?'
+    - 'nevermind i think I'll book separately'
+    - 'i need to figure out transportation while i'm there'
+    - 'Oh wait i haven't booked my flight yet i'll do that first'
+    - 'Hotel booking confirmed'
+tools:
+  - name: search_hotels
+    description: "Search for available hotels based on search criteria"
+    arguments:
+      type: object
+      properties:
+        location:
+          type: string
+        check_in_date:
+          type: string
+        check_out_date:
+          type: string
+        guests:
+          type: integer
+        room_type:
+          type: string
+  - name: book_hotel
+    description: "Book a hotel room"
+    arguments:
+      type: object
+      properties:
+        hotel_id:
+          type: string
+        room_type:
+          type: string
+        check_in_date:
+          type: string
+        check_out_date:
+          type: string
+        guests:
+          type: integer
+  - name: update_hotel
+    description: "Update an existing hotel booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        room_type:
+          type: string
+        check_in_date:
+          type: string
+        check_out_date:
+          type: string
+        guests:
+          type: integer
+  - name: cancel_hotel
+    description: "Cancel an existing hotel booking"
+    arguments:
+      type: object
+      properties:
+        booking_id:
+          type: string
+
+checkpointer:
+  type: "in_memory"
+  kwargs: {}
